@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Goals</title>
+    <link rel="stylesheet" href="{% static 'goals/css/styles.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #b4b1c4;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .navbar-logo img {
+            height: 40px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #2980b9;
+        }
+
+        .goal-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.6s ease forwards;
+            animation-delay: var(--delay, 0s);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .goal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .goal-stats {
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #3498db;
+            transition: width 1s ease-in-out;
+            width: 0%; /* start at zero for animation */
+        }
+
+        .actions {
+            margin-bottom: 20px;
+        }
+
+        .actions a {
+            text-decoration: none;
+            background: #27ae60;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .goal-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .goal-actions a {
+            text-decoration: none;
+            padding: 8px 12px;
+            background: #2980b9;
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        .goal-actions a:hover {
+            transform: scale(1.05);
+        }
+
+        .goal-actions .delete-btn {
+            background-color: #e74c3c;
+        }
+
+        .goal-actions .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .goal-actions .savings-btn {
+            background-color: #8e44ad;
+        }
+
+        .goal-actions .savings-btn:hover {
+            background-color: #6c3483;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-logo">
+            <img src="{% static '' %}" alt="">
+        </div>
+        <a href="{% url 'dashboard:dashboard' %}"><strong>Dashboard</strong></a>
+        <a href="{% url 'goals:goal_list' %}"><strong>Goals</strong></a>
+        <a href="{% url 'settings:settings_home' %}"><strong>Settings</strong></a>
+    </div>
+
+    <h2>My Goals</h2>
+    <div class="actions">
+        <a href="{% url 'goals:add_goal' %}">➕ Add New Goal</a>
+    </div>
+
+    {% for goal in goals %}
+        <div class="goal-card" style="--delay: {{ forloop.counter0|add:"0.1"|floatformat:1 }}s;">
+            <div class="goal-title">{{ goal.title }}</div>
+            <div class="goal-stats">
+                Saved: {{ goal.saved_amount }} / {{ goal.target_amount }}<br>
+                Progress: {{ goal.progress_percentage|default:"0"|floatformat:2 }}%
+            </div>
+            <div class="progress-bar">
+                <div class="progress" style="width: {{ goal.progress_percentage|default_if_none:0|floatformat:0 }}%;"></div>
+            </div>
+            <div class="goal-actions">
+                <a href="{% url 'goals:goal_update' goal.id %}">✏️ Edit</a>
+                <a href="{% url 'goals:goal_delete' goal.id %}" class="delete-btn">🗑️ Delete</a>
+                <a href="{% url 'goals:add_savings' goal.id %}" class="savings-btn">➕ Add Savings</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>No goals yet. Start by adding one!</p>
+    {% endfor %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".progress").forEach(function (bar) {
+                const width = bar.style.width;
+                bar.style.width = "0%";
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Goal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f0f2f5;
+        }
+
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+
+        .form-container {
+            background: white;
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form input, form select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #2980b9;
+        }
+
+        .errorlist {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{% url 'dashboard:dashboard' %}"><strong>Dashboard</strong></a>
+        <a href="{% url 'goals:goal_list' %}"><strong>Goals</strong></a>
+        <a href="{% url 'settings:settings_home' %}"><strong>Settings</strong></a>
+    </div>
+
+    <h2>Add a New Goal</h2>
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <label for="id_default_title">Choose a Default Goal:</label>
+            {{ form.default_title.errors }}
+            {{ form.default_title }}
+
+            <label for="id_custom_title">Or Enter Custom Title:</label>
+            {{ form.custom_title.errors }}
+            {{ form.custom_title }}
+
+            <label for="id_target_amount">Target Amount:</label>
+            {{ form.target_amount.errors }}
+            {{ form.target_amount }}
+
+            <label for="id_saved_amount">Initial Saved Amount:</label>
+            {{ form.saved_amount.errors }}
+            {{ form.saved_amount }}
+
+            <label for="id_deadline">Deadline:</label>
+            {{ form.deadline.errors }}
+            {{ form.deadline }}
+
+            <button type="submit">Create Goal</button>
+        </form>
+        <div class="back-link">
+            <a href="{% url 'goals:goal_list' %}">← Back to Goals</a>
+        </div>
+    </div>
+
+    <script>
+        const defaultField = document.getElementById("id_default_title");
+        const customField = document.getElementById("id_custom_title");
+
+        function toggleFields() {
+            const defaultFilled = defaultField.value.trim() !== "";
+            const customFilled = customField.value.trim() !== "";
+
+            defaultField.disabled = customFilled;
+            customField.disabled = defaultFilled;
+        }
+
+        defaultField.addEventListener("input", toggleFields);
+        customField.addEventListener("input", toggleFields);
+        window.addEventListener("DOMContentLoaded", toggleFields);  // initialize on load
+    </script>
+</body>
+</html>

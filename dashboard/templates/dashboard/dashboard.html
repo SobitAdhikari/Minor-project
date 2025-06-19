@@ -1,0 +1,312 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #b4b1c4;
+        }
+        h2, h3 {
+            color: #2c3e50;
+        }
+
+        /* .navbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        } */
+        .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .navbar-logo img {
+            height: 40px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #2980b9;
+        }
+
+        .card {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        .summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #1c5980;
+        }
+
+        canvas {
+            max-width: 500px;
+            max-height: 300px;
+            width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .filter-export {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            width: 400px;
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+        }
+      
+    </style>
+</head>
+<body>
+    <h2>Welcome {{ request.user.username }}💸</h2>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-logo">
+            <img src="{% static '' %}" alt="">
+        </div>
+        <a href="{% url 'dashboard:dashboard' %}"><strong>Dashboard</strong></a>
+        <a href="{% url 'goals:goal_list' %}"><strong>Goals</strong></a>
+        <a href="{% url 'settings:settings_home' %}"><strong>Settings</strong></a>
+        <div>
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="btn">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn">Login</a>
+        {% endif %}
+    </div>
+    </div>
+
+    
+
+    <div class="summary">
+        <div class="card">Total Income: Rs {{ income_total }}</div>
+        <div class="card">Total Expenses: Rs {{ expense_total }}</div>
+        <div class="card">Remaining: Rs {{ remaining }}</div>
+    </div>
+
+
+    <div class="filter-export">
+        <form method="get">
+            <label>From: <input type="date" name="start_date" value="{{ start_date }}"></label>
+            <label>To: <input type="date" name="end_date" value="{{ end_date }}"></label>
+            <button type="submit">Filter</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Expenses</h3>
+        <a href="{% url 'expense:create_expense' %}" class="btn">➕ Add Expense</a>
+        <a href="{% url 'expense:list_expenses' %}" class="btn secondary">📋 View All Expenses</a>
+        <a href="{% url 'dashboard:export_pdf' %}" class="btn secondary" target="_blank">📄 Export PDF</a>
+
+    </div>
+
+    <div class="card">
+        <h3>Add Income</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ income_form.as_p }}
+            <button type="submit">Add Income</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Expense Category Chart</h3>
+        <canvas id="categoryChart" width="400" height="300"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Daily Expenses</h3>
+        <canvas id="lineChart" width="500" height="300"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Monthly Expenses</h3>
+        <canvas id="barChart" width="500" height="300"></canvas>
+    </div>
+
+    <!-- Modal -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('infoModal').style.display='none'">&times;</span>
+            <h4 id="modalLabel">Category</h4>
+            <p id="modalValue">Details</p>
+        </div>
+    </div>
+
+    {{ chart_data|json_script:"chartData" }}
+    {{ daily_labels|json_script:"dailyLabels" }}
+    {{ daily_values|json_script:"dailyValues" }}
+    {{ month_labels|json_script:"monthLabels" }}
+    {{ month_values|json_script:"monthValues" }}
+
+    <script>
+        const chartData = JSON.parse(document.getElementById('chartData').textContent);
+        const categoryLabels = chartData.map(item => item.label);
+        const categoryValues = chartData.map(item => item.value);
+
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        const categoryChart = new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: ['#f39c12','#e74c3c','#8e44ad','#1abc9c','#3498db','#2ecc71']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 4/3,
+                onClick: (e, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const label = categoryChart.data.labels[index];
+                        const value = categoryChart.data.datasets[0].data[index];
+                        document.getElementById('modalLabel').innerText = label;
+                        document.getElementById('modalValue').innerText = `Total: ₹${value}`;
+                        document.getElementById('infoModal').style.display = 'block';
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: JSON.parse(document.getElementById('dailyLabels').textContent),
+                datasets: [{
+                    label: 'Daily Expenses',
+                    data: JSON.parse(document.getElementById('dailyValues').textContent),
+                    borderColor: '#2980b9',
+                    fill: true,
+                    backgroundColor: 'rgba(41, 128, 185, 0.2)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 5/3,
+            }
+        });
+
+        // const barCtx = document.getElementById('barChart').getContext('2d');
+        // new Chart(barCtx, {
+        //     type: 'bar',
+        //     data: {
+        //         labels: JSON.parse(document.getElementById('monthLabels').textContent),
+        //         datasets: [{
+        //             label: 'Monthly Expenses',
+        //             data: JSON.parse(document.getElementById('monthValues').textContent),
+        //             backgroundColor: '#8e44ad'
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         maintainAspectRatio: false,
+        //         aspectRatio: 5/3,
+        //     }
+        // });
+    const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: JSON.parse(document.getElementById('monthLabels').textContent),
+            datasets: [{
+                label: 'Monthly Expenses',
+                data: JSON.parse(document.getElementById('monthValues').textContent),
+                backgroundColor: '#8e44ad',
+                barPercentage: 0.4,         // Make bars thinner (0.4 is a good starting point)
+                categoryPercentage: 0.5     // Controls spacing between bars
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            aspectRatio: 5/3,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    </script>
+</body>
+</html>

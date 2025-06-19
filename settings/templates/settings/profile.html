@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #b4b1c4;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 30px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 1000px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar-logo img {
+            height: 40px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #2980b9;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        form p {
+            margin: 15px 0;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1c5980;
+        }
+
+        .message {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .message.success { color: green; }
+        .message.error, .message.danger { color: red; }
+        .message.info { color: #3498db; }
+        .message.warning { color: orange; }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="navbar-logo">
+            <img src="{% static '' %}" alt="Logo">
+        </div>
+        <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+        <a href="{% url 'goals:goal_list' %}">Goals</a>
+        <a href="{% url 'settings:settings_home' %}">Settings</a>
+    </div>
+
+    <div class="container">
+        <div class="box">
+            <h2>Manage Profile</h2>
+            {% if message %}
+            <p class="message {{ message.tags }}">{{ message }}</p>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <p><input type="text" name="username" placeholder="New Username" required></p>
+                <p><input type="password" name="current_password" placeholder="Current Password" required></p>
+                <p><input type="password" name="new_password" placeholder="New Password"></p>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

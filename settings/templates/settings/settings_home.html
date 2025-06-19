@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Settings</title>
+  <link rel="stylesheet" href="{% static 'goals/css/styles.css' %}" />
+  <style>
+    /* Adopt goals.html body bg and font */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #b4b1c4;
+      color: #2c3e50;
+    }
+
+    /* Navbar style from goals.html */
+    .navbar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 10px 20px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #2c3e50;
+      font-size: 16px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .navbar a:hover {
+      color: #2980b9;
+    }
+
+    /* Container styled like goal-card */
+    .container {
+      background: white;
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: #2c3e50;
+    }
+
+    /* Setting cards styled like goal-card */
+    .setting-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: default;
+    }
+
+    .setting-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .setting-card span {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    /* Buttons styled like goal-actions links */
+    .button {
+      padding: 8px 14px;
+      background: #2980b9;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background-color: #1c5980;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <a href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+    <a href="{% url 'goals:goal_list' %}">Goals</a>
+    <a href="{% url 'settings_app:settings_home' %}">Settings</a>
+  </div>
+
+  <div class="container">
+    <h2>App Settings</h2>
+
+    <div class="setting-card">
+      <span>Profile Management</span>
+      <a href="{% url 'settings_app:profile' %}" class="button">Manage</a>
+    </div>
+
+    <div class="setting-card">
+      <span>About</span>
+      <a href="{% url 'settings_app:about' %}" class="button">View</a>
+    </div>
+  </div>
+</body>
+</html>

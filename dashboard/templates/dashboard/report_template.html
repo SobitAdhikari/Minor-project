@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            color: #333;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .summary {
+            margin: 20px 0;
+            padding: 10px;
+            border-bottom: 2px solid #2980b9;
+        }
+        .summary div {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #2980b9;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .card {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            margin: 2px auto;
+            max-width: 700px;
+        }
+        .chart-title {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard Report</h1>
+
+    {% if start_date and end_date %}
+    <h2>From {{ start_date }} to {{ end_date }}</h2>
+    {% endif %}
+
+    <div class="summary">
+        <div><strong>Total Income:</strong> Rs {{ income_total }}</div>
+        <div><strong>Total Expenses:</strong> Rs {{ expense_total }}</div>
+        <div><strong>Remaining Balance:</strong> Rs {{ remaining }}</div>
+    </div>
+
+    <h2>Expense Details</h2>
+    {% if expenses %}
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Amount (Rs)</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.date|date:"Y-m-d" }}</td>
+                <td>{{ expense.title }}</td>
+                <td>{{ expense.amount }}</td>
+                <td>{{ expense.expense_type }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No expenses recorded for the selected period.</p>
+    {% endif %}
+
+    {% if pie_chart_base64 %}
+    <div class="card">
+        <div class="chart-title">Expense Distribution</div>
+        <div class="center">
+            <img src="data:image/png;base64,{{ pie_chart_base64 }}" style="width: 300px; height: 300px;" alt="Pie Chart">
+        </div>
+    </div>
+    {% endif %}
+
+    {% if bar_chart_base64 %}
+    <div class="card">
+        <div class="chart-title">Monthly Expenses</div>
+        <img src="data:image/png;base64,{{ bar_chart_base64 }}" style="width: 100%; height: auto;" alt="Monthly Expense Chart">
+    </div>
+    {% else %}
+    <p style="text-align:center;">No monthly expense data available.</p>
+    {% endif %}
+
+    <div class="footer">
+        Generated on {{ now|date:"Y-m-d H:i" }}
+    </div>
+</body>
+</html>

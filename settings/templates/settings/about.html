@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>About TrackMyCash</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #b4b1c4;
+            color: #2c3e50;
+        }
+        h2, h3 {
+            color: #2c3e50;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #2980b9;
+        }
+
+        /* Card style for about content */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+            padding: 25px 30px;
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ul {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="{% url 'dashboard:dashboard' %}"><strong>Dashboard</strong></a>
+        <a href="{% url 'goals:goal_list' %}"><strong>Goals</strong></a>
+        <a href="{% url 'settings:settings_home' %}"><strong>Settings</strong></a>
+    </div>
+
+    <div class="card">
+        <h2>About TrackMyCash</h2>
+        <p><strong>TrackMyCash</strong> is a personal finance tracker designed to help you manage your expenses, incomes, goals, and more.</p>
+        <p>Features include:</p>
+        <ul>
+            <li>Dashboard analytics</li>
+            <li>Goal savings with progress bars</li>
+            <li>Offline sync</li>
+            <li>Profile management</li>
+        </ul>
+        <p>Made using Django</p>
+    </div>
+</body>
+</html>
